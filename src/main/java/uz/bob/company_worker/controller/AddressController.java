@@ -25,7 +25,7 @@ public class AddressController {
 
     @GetMapping("/{id}")
     public HttpEntity<Address> getOneById(@PathVariable Integer id){
-
+        return null;
     }
     @PostMapping
     public ResponseEntity<ApiResponse> add(@RequestBody AddressDto addressDto){
@@ -34,12 +34,12 @@ public class AddressController {
 
     @PutMapping("/{id}")
     public ApiResponse edit(@PathVariable Integer id, @RequestBody AddressDto addressDto){
-
+return null;
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse delete(@PathVariable Integer id){
-
+        return null;
     }
 
 
