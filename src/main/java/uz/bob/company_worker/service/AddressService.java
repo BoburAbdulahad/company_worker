@@ -50,7 +50,7 @@ public class AddressService {
         editingAddress.setStreet(addressDto.getStreet());
         editingAddress.setHomeNumber(addressDto.getHomeNumber());
         Address savedAddress = addressRepository.save(editingAddress);
-        return new ApiResponse("Address edited",true);
+        return new ApiResponse("Address edited",true,savedAddress);
     }
 
     public ApiResponse delete(Integer id){

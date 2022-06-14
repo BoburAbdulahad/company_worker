@@ -8,9 +8,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import uz.bob.company_worker.entity.Address;
+import uz.bob.company_worker.entity.Company;
 import uz.bob.company_worker.payload.AddressDto;
 import uz.bob.company_worker.payload.ApiResponse;
+import uz.bob.company_worker.payload.CompanyDto;
 import uz.bob.company_worker.service.AddressService;
+import uz.bob.company_worker.service.CompanyService;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -18,42 +21,41 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/address")
-public class AddressController {
+@RequestMapping("/company")
+public class CompanyController {
 
     @Autowired
-    AddressService addressService;
+    CompanyService companyService;
+
 
     @GetMapping
-    public HttpEntity<List<Address>> get(){
-        return ResponseEntity.ok(addressService.getAll());
+    public HttpEntity<List<Company>> getAll(){
+        return new HttpEntity<>(companyService.getAll());
     }
 
     @GetMapping("/{id}")
-    public HttpEntity<Address> getOneById(@PathVariable Integer id){
-        Address oneById = addressService.getOneById(id);
-        return ResponseEntity.ok(oneById);
+    public HttpEntity<Company> getOneById(@PathVariable Integer id){
+        return new HttpEntity<>(companyService.getOneById(id));
     }
+
     @PostMapping
-    public ResponseEntity<ApiResponse> add(@Valid @RequestBody AddressDto addressDto){
-        ApiResponse add = addressService.add(addressDto);
-        return ResponseEntity.status(add.isSuccess()?201:409).body(add);
+    public HttpEntity<ApiResponse> add(@Valid @RequestBody CompanyDto companyDto){
+        ApiResponse add = companyService.add(companyDto);
+        return ResponseEntity.status(add.isSuccess()? HttpStatus.CREATED:HttpStatus.CONFLICT).body(add);
     }
 
     @PutMapping("/{id}")
-    public HttpEntity<ApiResponse> edit(@PathVariable Integer id,@Valid @RequestBody AddressDto addressDto){
-
-        ApiResponse edit = addressService.edit(id, addressDto);
-        if (edit.isSuccess())
-            return ResponseEntity.status(202).body(edit);
-        return ResponseEntity.status(409).body(edit);
+    public ResponseEntity<ApiResponse> edit(@PathVariable Integer id,@Valid @RequestBody CompanyDto companyDto){
+        ApiResponse apiResponse = companyService.edit(id, companyDto);
+        return ResponseEntity.status(apiResponse.isSuccess()?HttpStatus.ACCEPTED:HttpStatus.CONFLICT).body(apiResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> delete(@PathVariable Integer id){
-        ApiResponse delete = addressService.delete(id);
-        return ResponseEntity.status(delete.isSuccess()?204:409).body(delete);
+    public ResponseEntity<?> delete(@PathVariable Integer id){
+        ApiResponse delete = companyService.delete(id);
+        return ResponseEntity.status(delete.isSuccess()?HttpStatus.ACCEPTED:HttpStatus.CONFLICT).body(delete);
     }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -67,5 +69,4 @@ public class AddressController {
         });
         return errors;
     }
-
 }
