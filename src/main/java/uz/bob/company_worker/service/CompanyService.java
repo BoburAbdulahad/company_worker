@@ -11,6 +11,7 @@ import uz.bob.company_worker.repository.CompanyRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 @Service
 public class CompanyService {
@@ -36,6 +37,9 @@ public class CompanyService {
             return new ApiResponse("Its corparation name to have director name,pleace change one or more!",false);
         if (!addressRepository.existsById(companyDto.getAddressId()))
             return new ApiResponse("Address not found",false);
+        boolean existsByAddress_id = companyRepository.existsByAddress_Id(companyDto.getAddressId());
+        if (existsByAddress_id)
+            return new ApiResponse("Address already exist please enter other addressId",false);
         Company company=new Company();
         company.setCorpName(companyDto.getCorpName());
         company.setDirectorName(companyDto.getDirectorName());

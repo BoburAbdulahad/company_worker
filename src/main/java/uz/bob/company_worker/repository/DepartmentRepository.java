@@ -12,4 +12,5 @@ public interface DepartmentRepository extends JpaRepository<Department,Integer> 
     boolean existsByNameAndCompany_IdAndIdNot(String name, Integer company_id, Integer id);
 
 
+
 }
