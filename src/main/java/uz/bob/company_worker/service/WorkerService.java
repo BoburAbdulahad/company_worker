@@ -44,10 +44,6 @@ public class WorkerService {
         if (workerRepository.existsByAddress_Id(workerDto.getAddressId())) {
             return new ApiResponse("Its type address already exist other worker please enter other addressId",false);
         }
-//        Optional<Address> optionalAddress = addressRepository.findById(workerDto.getAddressId());
-//        if (!optionalAddress.isPresent()) {
-//            return new ApiResponse("Address not found",false);
-//        }
         if (!addressRepository.existsById(workerDto.getAddressId())) {
             return new ApiResponse("Address not found",false);
         }
@@ -61,7 +57,7 @@ public class WorkerService {
         }
 //        departmentsIds.forEach(integer -> departmentRepository.findById(integer).ifPresent(departmentSet::add));
 //        if (departmentSet.isEmpty())
-//            return new ApiResponse("Department set is empty",false);
+//            return new ApiResponse("departmentSet is empty",false);
 
         Worker worker=new Worker();
         worker.setName(workerDto.getName());
@@ -74,8 +70,37 @@ public class WorkerService {
     }
 
     public ApiResponse editWorker(Integer id,WorkerDto workerDto){
-        
+        departmentSet.clear();
+        Optional<Worker> optionalWorker = workerRepository.findById(id);
+        if (!optionalWorker.isPresent()) {
+            return new ApiResponse("Worker not found",false);
+        }
+        if (workerRepository.existsByAddress_IdAndIdNot(workerDto.getAddressId(),id)) {
+            return new ApiResponse("Its type address already exist other worker please enter other addressId",false);
+        }
+        if (!addressRepository.existsById(workerDto.getAddressId())) {
+            return new ApiResponse("Address not found",false);
+        }
+        boolean b = workerRepository.existsByPhoneNumberAndIdNot(workerDto.getPhoneNumber(), id);
+        if (b)
+            return new ApiResponse("Phone number already exist at the other worker",false);
+        Worker worker = optionalWorker.get();
+        worker.setName(workerDto.getName());
+        worker.setPhoneNumber(workerDto.getPhoneNumber());
+        worker.setAddress(addressRepository.getReferenceById(workerDto.getAddressId()));
+
+        List<Integer> departmentsIds = workerDto.getDepartmentsIds();
+        departmentsIds.forEach(integer -> departmentRepository.findById(integer).ifPresent(departmentSet::add));
+        if (departmentSet.isEmpty())
+            return new ApiResponse("departmentSet is empty",false);
+        worker.setDepartment(departmentSet);
+
+        workerRepository.save(worker);
+        departmentSet.clear();
+        return new ApiResponse("Worker successfully edited",true);
     }
+
+
 
 
 

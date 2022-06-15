@@ -4,11 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import uz.bob.company_worker.entity.Worker;
 import uz.bob.company_worker.payload.ApiResponse;
 import uz.bob.company_worker.payload.WorkerDto;
 import uz.bob.company_worker.service.WorkerService;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/worker")
@@ -31,14 +37,29 @@ public class WorkerController {
     }
 
     @PostMapping
-    public HttpEntity<ApiResponse> addWorker(@RequestBody WorkerDto workerDto){
+    public HttpEntity<ApiResponse> addWorker(@Valid  @RequestBody WorkerDto workerDto){
         ApiResponse apiResponse = workerService.addWorker(workerDto);
         return ResponseEntity.status(apiResponse.isSuccess()?201:409).body(apiResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editWorker(@PathVariable Integer id,@RequestBody WorkerDto workerDto){
-        return null;
+    public ResponseEntity<?> editWorker(@PathVariable Integer id,@Valid @RequestBody WorkerDto workerDto){
+        ApiResponse apiResponse = workerService.editWorker(id, workerDto);
+        return ResponseEntity.status(apiResponse.isSuccess()?202:409).body(apiResponse);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 
 
