@@ -48,6 +48,13 @@ public class WorkerController {
         return ResponseEntity.status(apiResponse.isSuccess()?202:409).body(apiResponse);
     }
 
+    @DeleteMapping("/{id}")
+    public HttpEntity<?> delete(@PathVariable Integer id){
+        ApiResponse apiResponse = workerService.delete(id);
+        return ResponseEntity.status(apiResponse.isSuccess()?HttpStatus.ACCEPTED:HttpStatus.CONFLICT).body(apiResponse);
+    }
+
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

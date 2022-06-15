@@ -100,6 +100,14 @@ public class WorkerService {
         return new ApiResponse("Worker successfully edited",true);
     }
 
+    public ApiResponse delete(Integer id){
+        if (!workerRepository.existsById(id)) {
+            return new ApiResponse("Worker not found",false);
+        }
+        workerRepository.deleteById(id);
+        return new ApiResponse("Worker deleted",true);
+    }
+
 
 
 
